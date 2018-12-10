@@ -36,11 +36,9 @@ exports.signup = (req, res, next) => {
 
 exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  console.log(email, password);
   let loadedUser;
   User.findOne({ email })
     .then(user => {
-        console.log(user);
       if (!user) {
         const error = new Error('Authentication failure');
         error.statusCode = 401;

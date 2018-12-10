@@ -5,6 +5,7 @@ const path = require('path');
 const multer = require('multer');
 
 const feedRoutes = require('./routes/feed');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 
@@ -13,7 +14,7 @@ const fileStorage = multer.diskStorage({
     cb(null, 'images');
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname + '-' + Date.now());
+    cb(null, Date.now() + '-' + file.originalname);
   }
 });
 
@@ -31,7 +32,7 @@ const fileFilter = (req, file, cb) => {
 
 app.use(bodyParser.json());
 app.use(
-  multer({ storage: fileStorage }).single('image')
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
 );
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
@@ -46,12 +47,14 @@ app.use((req, res, next) => {
 });
 
 app.use('/feed', feedRoutes);
+app.use('/auth', authRoutes);
 
 app.use((err, req, res, next) => {
   console.log(err);
   const status = err.statusCode || 500;
   const message = err.message;
-  res.status(status).json({ message });
+  const data = err.data;
+  res.status(status).json({ message, data });
 });
 
 mongoose

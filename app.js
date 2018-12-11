@@ -59,7 +59,7 @@ app.use((err, req, res, next) => {
 
 mongoose
   .connect(
-    `mongodb+srv://root:VF5PNL61GURC8bht@blog-cluster-pbtfx.mongodb.net/test?retryWrites=true`,
+    `mongodb+srv://root:VF5PNL61GURC8bht@blog-cluster-pbtfx.mongodb.net/blog?retryWrites=true`,
     { useNewUrlParser: true }
   )
   .then(result => app.listen(8080))

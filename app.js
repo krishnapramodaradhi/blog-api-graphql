@@ -3,9 +3,10 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
 const multer = require('multer');
+const graphqlHttp = require('express-graphql');
 
-const feedRoutes = require('./routes/feed');
-const authRoutes = require('./routes/auth');
+const schema = require('./graphql/schema');
+const resolver = require('./graphql/resolver');
 
 const app = express();
 
@@ -46,8 +47,20 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/feed', feedRoutes);
-app.use('/auth', authRoutes);
+app.use('/graphql', graphqlHttp({
+  schema,
+  rootValue: resolver,
+  graphiql: true,
+  formatError(err) {
+    if (!err.originalError) {
+      return err;
+    }
+    const data = err.originalError.data;
+    const status = err.originalError.code || 500;
+    const message = err.message || 'An Error occurred';
+    return { status, message, data };
+  }
+}));
 
 app.use((err, req, res, next) => {
   console.log(err);
